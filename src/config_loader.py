@@ -3,10 +3,16 @@ from pathlib import Path
 from typing import Any, Dict
 
 CONFIG_PATH = Path("config.json")
+EXAMPLE_CONFIG_PATH = Path("config.example.json")
 
 
 def load_config(path: Path = CONFIG_PATH) -> Dict[str, Any]:
-    """config.json을 읽어서 기본값까지 채운 설정 딕셔너리 반환"""
+    """config.json을 읽되, 없으면 config.example.json을 사용"""
+    if not path.exists():
+        # GitHub Actions 같은 환경에서는 config.json이 없으므로
+        # 예시 설정 파일을 대신 사용
+        path = EXAMPLE_CONFIG_PATH
+
     with path.open(encoding="utf-8") as f:
         raw = json.load(f)
 
