@@ -23,4 +23,4 @@ jobs:
           fi
 
       - name: Run main
-        run: python src/main.py
+        run: python -m src.main

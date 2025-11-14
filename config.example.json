@@ -1,11 +1,70 @@
 {
+  "settings": {
+    "default_timeout": 5,
+    "expiry_warning_days": 7
+  },
   "apis": [
     {
+      "id": "openai_models",
       "name": "OpenAI Models",
       "url": "https://api.openai.com/v1/models",
-      "expiry": "2025-12-31",
-      "auth_type": "bearer",
-      "token_env": "OPENAI_KEY"
+      "method": "GET",
+
+      "auth": {
+        "type": "bearer",
+        "token_env_key": "OPENAI_KEY"
+      },
+
+      "timeout": 5,
+      "expires_on": "2026-01-01",
+
+      "headers": {
+        "Content-Type": "application/json"
+      },
+
+      "body": null
+    },
+
+    {
+      "id": "example_public",
+      "name": "Example Public API",
+      "url": "https://httpbin.org/status/200",
+      "method": "GET",
+
+      "auth": {
+        "type": "none"
+      },
+
+      "timeout": 5,
+      "expires_on": null,
+
+      "headers": {},
+      "body": null
+    },
+
+    {
+      "id": "login_check",
+      "name": "My Login API (POST 예시)",
+      "url": "https://api.example.com/login",
+      "method": "POST",
+
+      "auth": {
+        "type": "apikey_header",
+        "header_name": "X-API-Key",
+        "token_env_key": "MY_API_KEY"
+      },
+
+      "timeout": 5,
+      "expires_on": null,
+
+      "headers": {
+        "Content-Type": "application/json"
+      },
+
+      "body": {
+        "username": "healthcheck_user",
+        "password": "********"
+      }
     }
   ]
 }
