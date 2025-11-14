@@ -1,0 +1,26 @@
+name: API Checker (manual test)
+
+on:
+  workflow_dispatch: {}  # 손으로 눌러서 실행만, 아직 스케줄 X
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies (없으면 스킵)
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Run main
+        run: python src/main.py
