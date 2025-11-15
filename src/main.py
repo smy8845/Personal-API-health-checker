@@ -1,40 +1,34 @@
+# src/main.py
+
 from src.config_loader import load_config
 from src.checker import check_single_api
+from src.notifications.builder import build_notifications
+from src.notifications.slack_sender import send_slack_message
 
 
-def print_api_result(result: dict) -> None:
-    """한 개 API 결과를 보기 좋게 출력."""
-    status = result["status"]
-    emoji = {
-        "ok": "🟢",
-        "warning": "🟡",
-        "expired": "🔴",
-        "error": "❌",
-        "none": "⚪",
-    }.get(status, "⚪")
+def main():
+    config = load_config()
 
-    print(f"{emoji} {result['name']}")
-    print(f"- URL: {result['url']}")
-    if result.get("response_ms") is not None:
-        print(f"- 응답시간: {result['response_ms']}ms")
-    if "expiry_label" in result:
-        print(f"- {result['expiry_label']}")
-    if status == "error" and "error" in result:
-        print(f"- 오류: {result['error']}")
-    print("-" * 40)
+    apis = config["apis"]
+    settings = config.get("settings", {})
+    notif_settings = config.get("notification", {})
 
+    slack_url = notif_settings.get("slack_webhook", "")
 
-def main() -> None:
-    cfg = load_config()
-    settings = cfg["settings"]
-    apis = cfg["apis"]
+    results = []
 
     print("=== API Health Check ===")
-    print(f"총 {len(apis)}개 API 검사\n")
 
-    for api_cfg in apis:
-        result = check_single_api(api_cfg, warning_days=settings["expiry_warning_days"])
-        print_api_result(result)
+    for api in apis:
+        print(f"\n▶ {api['name']}")
+        result = check_single_api(api, settings)
+        results.append(result)
+
+    # Slack 메시지 생성
+    messages = build_notifications(results)
+
+    # Slack 전송
+    send_slack_message(slack_url, messages)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,11 @@
     "default_timeout": 5,
     "expiry_warning_days": 7
   },
+
+  "notification": {
+    "slack_webhook": ""
+  },
+  
   "apis": [
     {
       "id": "openai_models",
