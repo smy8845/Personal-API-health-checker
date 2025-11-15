@@ -1,22 +1,41 @@
-from .config_loader import load_config
+from src.config_loader import load_config
+from src.checker import check_single_api
 
 
-def format_api_summary(api: dict) -> str:
-    """API 한 개에 대한 요약 문자열 (만료일 정보 제외)"""
-    return f"- {api['name']} ({api['method']} {api['url']}, timeout={api['timeout']}초)"
+def print_api_result(result: dict) -> None:
+    """한 개 API 결과를 보기 좋게 출력."""
+    status = result["status"]
+    emoji = {
+        "ok": "🟢",
+        "warning": "🟡",
+        "expired": "🔴",
+        "error": "❌",
+        "none": "⚪",
+    }.get(status, "⚪")
+
+    print(f"{emoji} {result['name']}")
+    print(f"- URL: {result['url']}")
+    if result.get("response_ms") is not None:
+        print(f"- 응답시간: {result['response_ms']}ms")
+    if "expiry_label" in result:
+        print(f"- {result['expiry_label']}")
+    if status == "error" and "error" in result:
+        print(f"- 오류: {result['error']}")
+    print("-" * 40)
 
 
 def main() -> None:
     cfg = load_config()
+    settings = cfg["settings"]
     apis = cfg["apis"]
 
-    print("=== API 설정 로드 결과 ===")
-    print(f"총 {len(apis)}개 API")
+    print("=== API Health Check ===")
+    print(f"총 {len(apis)}개 API 검사\n")
 
-    for api in apis:
-        print(format_api_summary(api))
+    for api_cfg in apis:
+        result = check_single_api(api_cfg, warning_days=settings["expiry_warning_days"])
+        print_api_result(result)
 
 
 if __name__ == "__main__":
-    # 모듈로 실행할 때는 거의 안 쓰겠지만, 로컬 테스트용으로 남겨둠
     main()
